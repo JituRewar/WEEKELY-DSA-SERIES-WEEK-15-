@@ -1,0 +1,126 @@
+# Week 15 - Day 5: Course Schedule II (LeetCode 210)
+
+## 📌 Problem Statement
+There are `numCourses` courses labeled from `0` to `n-1`.
+
+You are given prerequisites:
+
+👉 Return **any valid order** of courses you can take  
+👉 If impossible (cycle exists), return **empty array**
+
+---
+
+## 🚀 Approach (BFS - Kahn’s Algorithm)
+
+This is an extension of **LeetCode 207**.
+
+Instead of just checking feasibility:
+👉 We **return the topological order**
+
+---
+
+## 🧠 Key Idea
+
+1. Build graph (adjacency list)  
+2. Compute indegree of each node  
+3. Push all nodes with indegree = 0 into queue  
+4. Perform BFS:
+   - Remove node
+   - Add it to answer
+   - Reduce indegree of neighbors  
+   - Push new indegree 0 nodes  
+
+---
+
+## 🔥 Logic
+
+- If result size == total nodes → valid order ✅  
+- Else → cycle exists → return empty ❌  
+
+---
+
+## ⚡ Time Complexity
+- **O(V + E)**
+
+## 💾 Space Complexity
+- **O(V + E)**
+
+---
+  class Solution {
+public:
+    bool iscycleDFS(int src, vector<bool>& vis, vector<bool>& recpath,
+                    vector<vector<int>>& edges) {
+        vis[src] = true;
+        recpath[src] = true;
+
+        // finding it's neighbours
+        for (int i = 0; i < edges.size(); i++) {
+            int v = edges[i][0];
+            int u = edges[i][1];
+
+            if (src == u) {
+                if (!vis[v]) {
+                    if (iscycleDFS(v, vis, recpath, edges)) {
+                        return true;
+                    }
+                } else if (recpath[v]) {
+                    return true;
+                }
+            }
+        }
+
+        recpath[src] = false;
+        return false;
+    }
+
+    // topo sort
+    void topoOrder(int src, stack<int>& s, vector<bool>& vis,
+                   vector<vector<int>>& edges) {
+        vis[src] = true;
+
+        for (int i = 0; i < edges.size(); i++) {
+            int v = edges[i][0];
+            int u = edges[i][1];
+
+            if (src == u) {
+                if (!vis[v]) {
+                    topoOrder(v, s, vis, edges);
+                }
+            }
+        }
+        s.push(src);
+    }
+
+    vector<int> findOrder(int n, vector<vector<int>>& edges) {
+        vector<bool> vis(n, false);
+        vector<bool> recpath(n, false);
+        vector<int> ans;
+
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                if (iscycleDFS(i, vis, recpath, edges)) {
+                    return ans;
+                }
+            }
+        }
+
+        // topological sorted order
+        stack<int> s;
+        vis.assign(n, false);
+        for (int i = 0; i < n; i++) {
+            if (!vis[i]) {
+                 topoOrder(i, s, vis, edges);
+            }
+        }
+        // extracting answer from stack
+        while (s.size() > 0) {
+            ans.push_back(s.top());
+            s.pop();
+        }
+        return ans;
+    }
+};
+
+## 📊 Example
+
+Input:
