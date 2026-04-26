@@ -1,0 +1,120 @@
+# Week 15 - Day 7: Kahn’s Algorithm (Topological Sort - BFS)
+
+## 📌 Problem Statement
+Perform **Topological Sorting** of a Directed Acyclic Graph (DAG) using **Kahn’s Algorithm (BFS)**.
+
+👉 Return a valid linear ordering of vertices such that:
+For every directed edge `u → v`, `u` appears before `v`.
+
+---
+
+## 🚀 Approach (BFS - Kahn’s Algorithm)
+
+This algorithm is based on **indegree (incoming edges)**.
+
+---
+
+## 🧠 Key Idea
+
+1. Calculate indegree of all nodes  
+2. Push nodes with indegree = 0 into queue  
+3. While queue is not empty:
+   - Pop node
+   - Add to result
+   - Reduce indegree of neighbors
+   - If indegree becomes 0 → push into queue  
+
+---
+  #include <bits/stdc++.h>
+using namespace std;
+
+class Graph
+{
+    int V;
+    list<int> *l;
+
+public:
+    Graph(int V)
+    {
+        this->V = V;
+        l = new list<int>[V];
+    }
+
+    // Best practice: Add a destructor to free memory
+    ~Graph()
+    {
+        delete[] l;
+    }
+
+    void addEdge(int u, int v)
+    {
+        l[u].push_back(v); // For directed graph, only add edge from u to v
+    }
+
+    void topoSort()
+    {
+        queue<int> q;
+        vector<int> res;
+        // kahn's algo
+        // by indegree calculations
+        vector<int> indegree(V, 0);
+        for (int u = 0; u < V; u++)
+        {
+            for (int v : l[u])
+            {
+                indegree[v]++;
+            }
+        }
+
+        // o indegree nodes were added in queue
+        for (int u = 0; u < V; u++)
+        {
+            if (indegree[u] == 0)
+            {
+                q.push(u);
+            }
+        }
+
+        // bfs
+        while (q.size() > 0)
+        {
+            int curr = q.front();
+            res.push_back(curr);
+            q.pop();
+
+            for (int v : l[curr])
+            {
+                indegree[v]--;
+                if (indegree[v] == 0)
+                {
+                    q.push(v);
+                }
+            }
+        }
+
+        // printing
+        for(int i=0;i<res.size();i++){
+            cout<<res[i]<< " ";
+        }
+        cout<<endl;
+    }
+};
+
+int main()
+{
+
+    Graph g(6);
+    // asuming that graph was DAG(directed acyclic graph)
+    g.addEdge(3, 1);
+    g.addEdge(2, 3);
+    g.addEdge(4, 0);
+    g.addEdge(4, 1);
+    g.addEdge(5, 0);
+    g.addEdge(5, 2);
+
+    g.topoSort();
+
+    return 0;
+}
+
+## 🔥 Algorithm
